@@ -74,8 +74,8 @@ void initWiFi() {
 
 void displayTime(){
 
-  String curTime = "ERROR!";
-  String curDate = "ERROR!";
+  String curTime = "ERR";
+  String curDate = "ERR";
   String curWeekDay = "ERR";
   String curMonth = "ERR";
   String curHour = "ER";
@@ -83,6 +83,14 @@ void displayTime(){
   String curSec = "ER";
   
   epochTime = getTime();
+  if (epochTime == 0){
+    dma_display->clearScreen();
+    dma_display->setCursor(1,1);
+    dma_display->setTextColor(dma_display->color444(0,8,15));
+    dma_display->print("ERROR!\nCould not get time");
+    delay(1000);
+    return;
+  }
   //Serial.println(getTime());
   //Serial.println(epochTime);
   stamp.getDateTime(epochTime);
@@ -190,33 +198,25 @@ void setup() {
   dma_display->begin();
   dma_display->setBrightness8(90); //0-255
   dma_display->clearScreen();
-  dma_display->fillScreen(myWHITE);
-  dma_display->fillRect(0, 0, dma_display->width(), dma_display->height(), dma_display->color444(0, 15, 0));
-  delay(500);
-  dma_display->drawRect(0, 0, dma_display->width(), dma_display->height(), dma_display->color444(15, 15, 0));
-  delay(500);
-  dma_display->drawLine(0, 0, dma_display->width()-1, dma_display->height()-1, dma_display->color444(15, 0, 0));
-  dma_display->drawLine(dma_display->width()-1, 0, 0, dma_display->height()-1, dma_display->color444(15, 0, 0));
-  delay(500);
-  dma_display->drawCircle(10, 10, 10, dma_display->color444(0, 0, 15));
-  delay(500);
-  dma_display->fillCircle(40, 21, 10, dma_display->color444(15, 0, 15));
-  delay(500);
+
+  //Splash Screen
+  printIcon(0,0,&windows);
+  delay(2500);
 
   // fill the screen with 'black'
   dma_display->fillScreen(dma_display->color444(0, 0, 0));
   dma_display->setTextSize(1);     // size 1 == 8 pixels high
-  dma_display->setTextWrap(false); // Don't wrap at end of line - will do ourselves
+  dma_display->setTextWrap(true); // Don't wrap at end of line - will do ourselves
 
   Serial.begin(115200);
   
-  //initWiFi();
-  //configTime(0, 0, ntpServer);
+  initWiFi();
+  configTime(0, 0, ntpServer);
 }
 
 void loop() {
-  //displayTime();
+  displayTime();
   //printKirby(kirby);
-  //dma_display->fillScreen(myBLUE);
-  printIcon(0,0,&korby);
+  //dma_display->fillScreen(myRED);
+  //printIcon(0,0,&korby);
 }

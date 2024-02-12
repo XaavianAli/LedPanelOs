@@ -12,8 +12,10 @@ int main(){
 	fstream *input;
 	input = new fstream;
 
+	string filename = "windows.bmp";
+
 	//Opening bitmap file 
-	input->open("green.bmp", ios::binary | ios::in | ios::out);
+	input->open(filename, ios::binary | ios::in | ios::out);
 
 	//Creating bitmap object using the fstream object in the constructor
 	Bitmap *bar;
@@ -28,15 +30,15 @@ int main(){
 	cout << "Image height: " << bar->getHeight() << " pixels\n\n";
 	cout << "Total Pixels: " << bar->getArraySize() << "\n\n";
 
-    cout << "How many pixels total??? " << bar->pixelArray.size() << endl;
+    cout << "How many pixels total??? " << bar->pixelArray.size() << endl << endl;
 
-    cout << "{";
+    cout << "icon " << filename.substr(0, filename.find(".")) << " = {\n  " << bar->getHeight() << ",\n  " << bar->getWidth() << ",\n  {";
     for (int i = bar->pixelArray.size() - bar->getWidth(); i >= 0; i = i - bar->getWidth()){
         for (int j = 0; j < bar->getWidth(); j++){
             cout << "{" << (int)bar->getPixelArray(i+j, "b") << "," << (int)bar->getPixelArray(i+j, "g") << "," << (int)bar->getPixelArray(i+j, "r") << "},";
         }
     }
-    cout << "};" << endl;
+    cout << "}\n};" << endl;
 
     /*
 	//Changing the green value of every pixel in the bitmap object to 0
