@@ -1,13 +1,19 @@
+//PIN 25 ON THE WROOM-ESP32 SHOULD NOT BE USED AS GPIO FOR VOLTAGE SENSITIVE DEVICES WHEN WIFI IS ENABLED AS IT CAUSES VOLTYAGE SPIKES DURING WIFI UPLINK/DOWNLINK OPERATIONS
+
 #include <WiFi.h>
 #include <UnixTime.h>
 #include <ESP32-HUB75-MatrixPanel-I2S-DMA.h>
 #include <ESP32Ping.h>
+#include <Adafruit_GFX.h>
+//#include <Fonts/Tiny3x3a2pt7b.h>
 
 #include "time.h"
 #include "display.h"
 #include "icons.h"
 
 UnixTime stamp(-5);
+
+const int fontDelta = 0;
 
 String load[4] = {"-","\\","|","/"};
 
@@ -32,7 +38,7 @@ unsigned long getTime() {
 void initWiFi() {
 
   dma_display->clearScreen();
-  dma_display->setCursor(1,1);
+  dma_display->setCursor(1,1 + fontDelta);
   dma_display->setTextColor(dma_display->color444(0,8,15));
   dma_display->print("Connecting");
   
@@ -42,18 +48,18 @@ void initWiFi() {
   for (int i = 0; WiFi.status() != WL_CONNECTED; i++) {
     //Serial.print('.');
     dma_display->clearScreen();
-    dma_display->setCursor(1,1);
+    dma_display->setCursor(1,1 + fontDelta);
     dma_display->setTextColor(dma_display->color444(0,8,15));
     dma_display->print("Connecting");
-    dma_display->setCursor(1,12);
+    dma_display->setCursor(1,12 + fontDelta);
     dma_display->print(load[i%4]);
     delay(250);
   }
   Serial.println(WiFi.localIP());
   dma_display->clearScreen();
-  dma_display->setCursor(1,1);
+  dma_display->setCursor(1,1 + fontDelta);
   dma_display->print("Connected!");
-  dma_display->setCursor(1,12);
+  dma_display->setCursor(1,12 + fontDelta);
   dma_display->print(WiFi.localIP());
 
   bool success = Ping.ping("www.google.com", 3);
@@ -61,14 +67,14 @@ void initWiFi() {
   if(!success){
     Serial.println("Ping failed");
     dma_display->clearScreen();
-    dma_display->setCursor(1,1);
+    dma_display->setCursor(1,1 + fontDelta);
     dma_display->print("Ping BAD");
     return;
   }
  
   Serial.println("Ping succesful.");
   dma_display->clearScreen();
-  dma_display->setCursor(1,1);
+  dma_display->setCursor(1,1 + fontDelta);
   dma_display->print("Ping OK");
 }
 
@@ -85,8 +91,8 @@ void displayTime(){
   epochTime = getTime();
   if (epochTime == 0){
     dma_display->clearScreen();
-    dma_display->setCursor(1,1);
-    dma_display->setTextColor(dma_display->color444(0,8,15));
+    dma_display->setCursor(1,1 + fontDelta);
+    dma_display->setTextColor(dma_display->color444(15,15,15));
     dma_display->print("ERROR!\nCould not get time");
     delay(1000);
     return;
@@ -171,13 +177,13 @@ void displayTime(){
   
   dma_display->clearScreen();
   
-  dma_display->setCursor(1,1);
-  dma_display->setTextColor(dma_display->color444(0,8,15));
+  dma_display->setCursor(1,1 + fontDelta);
+  dma_display->setTextColor(dma_display->color444(random(16),random(16),random(16)));
   dma_display->print(curDate);
   //Serial.println(curDate);
 
-  dma_display->setCursor(1,12);
-  dma_display->setTextColor(dma_display->color444(0,8,15));
+  dma_display->setCursor(1,12 + fontDelta);
+  dma_display->setTextColor(dma_display->color444(random(16),random(16),random(16)));
   dma_display->print(curTime);
   Serial.println(curTime);
   
@@ -200,23 +206,27 @@ void setup() {
   dma_display->clearScreen();
 
   //Splash Screen
-  printIcon(0,0,&windows);
-  delay(2500);
+  printIcon(0,0,&splash);
+  delay(3000);
 
   // fill the screen with 'black'
   dma_display->fillScreen(dma_display->color444(0, 0, 0));
   dma_display->setTextSize(1);     // size 1 == 8 pixels high
+  dma_display->setCursor(0,0 + fontDelta);
+  //dma_display->setFont(&Tiny3x3a2pt7b);
   dma_display->setTextWrap(true); // Don't wrap at end of line - will do ourselves
 
   Serial.begin(115200);
   
   initWiFi();
   configTime(0, 0, ntpServer);
+
 }
 
 void loop() {
   displayTime();
   //printKirby(kirby);
   //dma_display->fillScreen(myRED);
-  //printIcon(0,0,&korby);
+  //printIcon(0,0,&splash);
+  //for(;;){}
 }
