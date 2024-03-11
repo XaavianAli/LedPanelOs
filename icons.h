@@ -15,17 +15,12 @@ struct icon {
 };
 
 void printIcon(int x, int y, icon* c) {
-  dma_display->clearScreen();
   dma_display->setCursor(x,y);
   int j = x;
   int k = y;
   for (int i = 0; i < c->height*c->width; i++){
     if (j > c->width-1) {j = 0; k++;}
     dma_display->drawPixelRGB888(j, k, (uint8_t)c->pixels[i][0], (uint8_t)c->pixels[i][1], (uint8_t)c->pixels[i][2]);
-    for (int g = 0; g < 3; g++) {
-      Serial.print(String((uint8_t)c->pixels[i][g]) + " ");
-    }
-    Serial.println();
     j++;
   }
 }

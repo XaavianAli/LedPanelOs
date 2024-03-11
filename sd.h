@@ -162,59 +162,16 @@ void testFileIO(fs::FS &fs, const char * path){
     file.close();
 }
 
+void sdSetup(){
+  dma_display->clearScreen();
+  dma_display->setCursor(1,1 + fontDelta);
+  if (!SD.begin()){
+    dma_display->print("SD Card Not Found :(");
+    for(;;){};
+  }
+  dma_display->print("SD OK");
+  delay(1000);
+  return;
+}
+
 #endif
-
-//Example stuff
-/*
-void setup(){
-  
-    Serial.begin(115200);
-    delay(1000);
-    Serial.println("Trying to connect...");
-    if(!SD.begin()){
-        Serial.println("Card Mount Failed");
-        return;
-    }else{
-      Serial.println("wow!");
-    }
-    uint8_t cardType = SD.cardType();
-
-    if(cardType == CARD_NONE){
-        Serial.println("No SD card attached");
-        return;
-    }
-
-    Serial.print("SD Card Type: ");
-    if(cardType == CARD_MMC){
-        Serial.println("MMC");
-    } else if(cardType == CARD_SD){
-        Serial.println("SDSC");
-    } else if(cardType == CARD_SDHC){
-        Serial.println("SDHC");
-    } else {
-        Serial.println("UNKNOWN");
-    }
-
-    uint64_t cardSize = SD.cardSize() / (1024 * 1024);
-    Serial.printf("SD Card Size: %lluMB\n", cardSize);
-
-    listDir(SD, "/", 0);
-    createDir(SD, "/mydir");
-    listDir(SD, "/", 0);
-    removeDir(SD, "/mydir");
-    listDir(SD, "/", 2);
-    writeFile(SD, "/hello.txt", "Hello ");
-    appendFile(SD, "/hello.txt", "World!\n");
-    readFile(SD, "/hello.txt");
-    deleteFile(SD, "/foo.txt");
-    renameFile(SD, "/hello.txt", "/foo.txt");
-    readFile(SD, "/foo.txt");
-    testFileIO(SD, "/test.txt");
-    Serial.printf("Total space: %lluMB\n", SD.totalBytes() / (1024 * 1024));
-    Serial.printf("Used space: %lluMB\n", SD.usedBytes() / (1024 * 1024));
-}
-
-void loop(){
-
-}
-*/
