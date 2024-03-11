@@ -66,6 +66,7 @@ void loop(){
     {"Clock", displayTime},
     {"Kirby", kirbyMe},
     {"Rot.Test", rotaryTest},
+    {"Plasma", plasma},
     {"Sample", sampleApp},
     {"Settings", reset},
     {"Reboot", reset}, 
@@ -112,6 +113,7 @@ void loop(){
     }
 
     // Code
+    // TODO: fix bug where menu will crash after being on for 64 years straight
     menuChar++;
     
   }

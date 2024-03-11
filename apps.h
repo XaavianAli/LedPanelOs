@@ -6,5 +6,6 @@
 #include "displayTime.h"
 #include "rotaryTest.h"
 #include "kirby.h"
+#include "plasma.h"
 
 #endif
