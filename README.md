@@ -6,7 +6,7 @@ This is just a little pet project of mine. The goal is to have a little stock-ti
 # Getting Started
 ## Hardware
 ### Supported Hardware
-As of right now, an ESP32 (Original ESP WROOM 32) is being used as the brains. The ESP32-S2 and ESP32-S3 should also work fine, but have not been tested yet. A generic 32x64 LED panel used as display. Any one with **THIS** connector at the back should work fine. Other hardware used includes an SD card reader, and a rotary encoder with push button. Any generic component should work fine for these.
+As of right now, an ESP32 (Original ESP WROOM 32) is being used as the brains. The ESP32-S2 and ESP32-S3 should also work fine, but have not been tested yet. A generic 32x64 LED panel used as display. Any one with **THIS** connector at the back should work fine. Other hardware used includes an SD card reader, a simple push button, and a rotary encoder with push button. Any generic component should work fine for these.
 ### Wiring Diagram
 On the TODO list.
 ### Power
@@ -20,14 +20,19 @@ There are config files on the SD card, so that you don't have to reflash the boa
 Use Arduino IDE dummy
 And install some libraries too
 ## Applications
-Goal is to have a little home screen where you can navigate to different apps. Currently in development.
+From the main screen after booting, you can select whatevery app to run. You can return to the menu by pressing the menu button
 ### Current Apps
-Currently, I only have a date and time app (Which is quite ugly to say the least). More coming in the future.
+- **Clock (WIP)**: Displays date and time
+- **Settings (WIP)**: Modify certain system settings
+More coming in the future.
 ### How to add an app
-Unsupported as of right now. If your app needs assets, consider putting them on the SD card in a folder with the application name, and loading them only when needed.
+To add an app. first create a `<appname>.h` file in the root directory of the project. Next, use the template in `sample.h` to make your app. Note that the main function must return void and take no arguments. When done, add `#include "<appname>.h"` to the `app.h` file. Finally, in `main.ino`, add your app in the `menuItems` array, by supplying its name, and the name of its function. These names are limited to 9 characters long.    
+If your app needs assets, consider putting them on the SD card in a folder with the application name, and loading them only when needed.
 # Further Information
 ## Why did you do *x* like this? Wouldn't it be faster/better/safer to do it like *this* instead?
 Probably.
+## The Arduino IDE is giving me an error when I try to flash the board, how do I fix it?
+Google is your friend here. If you believe it's an issue with the code, please reach out to me and let me know.
 ## Can I use a different microcontroller for this? How about an Arduino UNO? A RaspberryPi? ESP8266?
 Only the ESP32 will work directly out of the box with this code. It is **HIGHLY** dependent on [*this*](https://github.com/mrfaptastic/ESP32-HUB75-MatrixPanel-DMA) library for the graphics interface, which only supports the ESP32. If you want to port this to work with another microcontroller, you will have to completely replace the graphics interface which at that point just start your own thing from scratch. Keep in mind that for whatever you use, you'll need enough IO pins for the panel, buttons, and SD card reader. Also, microcontrollers like the Arduino UNO have a very small amount of SRAM on them, meaning they will most likely not be suitable for this type of project.
 ## Can I use a bigger LED panel? How about chaining multiple together?
