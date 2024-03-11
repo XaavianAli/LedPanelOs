@@ -1,4 +1,5 @@
 # LedPanelOS *(Name Pending)*
+# Current Version: 0.0.0
 # Introduction
 ### This is still a MAJOR work in progress. If you stumble upon this repo in this state, don't expect anything to work or make any sense
 This is just a little pet project of mine. The goal is to have a little stock-ticker like device that can sit on your desk and do neat things like show you live sports scores, track the prices of stocks, or simply display the time.
@@ -35,3 +36,6 @@ It's currently unsupported. everything is made to run on one 32x64 display, it w
 Definitely feel free to use and/or modify this code to suit your personal needs! However, you may **NOT** monetize any project that uses this code, in full or in part. Keep in mind that this project also uses many libraries, and that you should make sure that you have permissions to use those in whatever way you need to.
 # Thanks
 The following libraries were used to project. Thank you so much!
+# Changelog
+## 0.0.0
+- HEHEHA
