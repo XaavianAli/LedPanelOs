@@ -1,15 +1,64 @@
-//PIN 25 ON THE WROOM-ESP32 SHOULD NOT BE USED AS GPIO FOR VOLTAGE SENSITIVE DEVICES WHEN WIFI IS ENABLED AS IT CAUSES VOLTYAGE SPIKES DURING WIFI UPLINK/DOWNLINK OPERATIONS
+//PIN 25 ON THE WROOM-ESP32 SHOULD NOT BE USED AS GPIO FOR VOLTAGE SENSITIVE DEVICES WHEN WIFI IS ENABLED AS IT CAUSES VOLTAGE SPIKES DURING WIFI UPLINK/DOWNLINK OPERATIONS
+//Pin 2 also causes some dumb issues
+//Use Serial1 or Serial2instead of Serial or else you degrade the speed of the LED panel (Unless you set a very high baud rate I guess)
 
 #include <WiFi.h>
 #include <UnixTime.h>
 #include <ESP32-HUB75-MatrixPanel-I2S-DMA.h>
 #include <ESP32Ping.h>
 #include <Adafruit_GFX.h>
+#include "AiEsp32RotaryEncoder.h"
 //#include <Fonts/Tiny3x3a2pt7b.h>
 
+#include "sd.h"
 #include "time.h"
 #include "display.h"
 #include "icons.h"
+
+#define ROTARY_ENCODER_A_PIN 36
+#define ROTARY_ENCODER_B_PIN 39
+#define ROTARY_ENCODER_BUTTON_PIN -1
+#define ROTARY_ENCODER_VCC_PIN -1
+#define ROTARY_ENCODER_STEPS 4
+
+//Kinda snapped with how stupid this is, created off of the perc30
+class rotary {
+  public:
+  AiEsp32RotaryEncoder r;
+  int b;
+  int previousR = 0;
+  bool pressed = false;
+  int readR(){
+    int current = r.readEncoder();
+    if (current == previousR) {
+      return 0;
+    } else if (current > previousR) {
+      previousR = current;
+      return 1;
+    } else {
+      previousR = current;
+      return -1;
+    }
+  }
+  int getR() {
+    return r.readEncoder();
+  }
+  int readB(){
+    int current = !digitalRead(b);
+    if (current == 1 && !pressed){
+      pressed = true;
+      return 1;
+    } else if (current == 0 && pressed){
+      pressed = false;
+    }
+    return 0;
+  }
+  int getB() {
+    return !digitalRead(b);
+  }
+};
+
+rotary wheel;
 
 UnixTime stamp(-5);
 
@@ -27,11 +76,26 @@ unsigned long getTime() {
   time_t now;
   struct tm timeinfo;
   if (!getLocalTime(&timeinfo)) {
-    Serial.println("Failed to obtain time");
+    //Serial.println("Failed to obtain time");
     return(0);
   }
   time(&now);
   return now;
+}
+
+//SD setup
+void sdSetup(){
+  dma_display->clearScreen();
+  dma_display->setCursor(1,1 + fontDelta);
+  if (!SD.begin()){
+    dma_display->print("SD Card Not Found :(");
+    delay(1000);
+    return;
+  }
+  dma_display->print("SD card init!");
+
+  readFile(SD, "/foo.txt");
+  return;
 }
 
 // Initialize WiFi
@@ -44,7 +108,7 @@ void initWiFi() {
   
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
-  Serial.print("Connecting to WiFi ..");
+  //Serial.print("Connecting to WiFi ..");
   for (int i = 0; WiFi.status() != WL_CONNECTED; i++) {
     //Serial.print('.');
     dma_display->clearScreen();
@@ -55,7 +119,7 @@ void initWiFi() {
     dma_display->print(load[i%4]);
     delay(250);
   }
-  Serial.println(WiFi.localIP());
+  //Serial.println(WiFi.localIP());
   dma_display->clearScreen();
   dma_display->setCursor(1,1 + fontDelta);
   dma_display->print("Connected!");
@@ -65,17 +129,18 @@ void initWiFi() {
   bool success = Ping.ping("www.google.com", 3);
  
   if(!success){
-    Serial.println("Ping failed");
+    //Serial.println("Ping failed");
     dma_display->clearScreen();
     dma_display->setCursor(1,1 + fontDelta);
     dma_display->print("Ping BAD");
     return;
   }
  
-  Serial.println("Ping succesful.");
+  //Serial.println("Ping succesful.");
   dma_display->clearScreen();
   dma_display->setCursor(1,1 + fontDelta);
   dma_display->print("Ping OK");
+  delay(1000);
 }
 
 void displayTime(){
@@ -185,9 +250,42 @@ void displayTime(){
   dma_display->setCursor(1,12 + fontDelta);
   dma_display->setTextColor(dma_display->color444(random(16),random(16),random(16)));
   dma_display->print(curTime);
-  Serial.println(curTime);
+  //Serial.println(curTime);
   
   delay(1000);
+}
+
+void IRAM_ATTR readEncoderISR()
+{
+  wheel.r.readEncoder_ISR();
+}
+
+void rotarySetup() {
+
+  wheel.r = AiEsp32RotaryEncoder(ROTARY_ENCODER_A_PIN, ROTARY_ENCODER_B_PIN, ROTARY_ENCODER_BUTTON_PIN, ROTARY_ENCODER_VCC_PIN, ROTARY_ENCODER_STEPS);
+  wheel.b = 34;
+  pinMode(34, INPUT_PULLUP);
+  wheel.r.begin();
+  wheel.r.setup(readEncoderISR);
+  wheel.r.setBoundaries(0, 100000000, false);
+  wheel.r.setEncoderValue(50000000);
+  
+  rotaryTest();
+}
+
+void rotaryTest(){
+  for(;;){
+    dma_display->clearScreen();
+    dma_display->setCursor(1,1 + fontDelta);
+    dma_display->print(wheel.readR());
+    dma_display->setCursor(1,12 + fontDelta);
+    dma_display->print(wheel.readB());
+    dma_display->setCursor(7,12 + fontDelta);
+    dma_display->print(wheel.getB());
+    dma_display->setCursor(1,23 + fontDelta);
+    dma_display->print(wheel.getR());
+    delay(50);
+  }
 }
 
 void setup() {
@@ -214,19 +312,21 @@ void setup() {
   dma_display->setTextSize(1);     // size 1 == 8 pixels high
   dma_display->setCursor(0,0 + fontDelta);
   //dma_display->setFont(&Tiny3x3a2pt7b);
-  dma_display->setTextWrap(true); // Don't wrap at end of line - will do ourselves
+  dma_display->setTextWrap(true);
 
-  Serial.begin(115200);
+  Serial.begin(500000);
   
   initWiFi();
   configTime(0, 0, ntpServer);
+  sdSetup();
 
 }
 
 void loop() {
   displayTime();
+  //rotarySetup();
   //printKirby(kirby);
   //dma_display->fillScreen(myRED);
-  //printIcon(0,0,&splash);
+  //printIcon(0,0,&korby);
   //for(;;){}
 }
