@@ -13,13 +13,9 @@ UnixTime stamp(-5);
 
 String load[4] = {"-","\\","|","/"};
 
-// FOR THE LOVE OF GOD SQUASH THE COMMITS SO YOU CAN'T SEE THE WIFI PASSWORD IN GITHUB
-const char* ssid = "Homenet-Games";
-const char* password = "i love supersmashbros";
 const char* ntpServer = "pool.ntp.org";
 unsigned long epochTime;
 
-const int fontDelta = 0;
 const int reverseRotary = -1; // Switch between -1 and 1 to get desired function
 
 struct menuItem {
@@ -39,12 +35,22 @@ void reset() {
 // Initialize WiFi
 void initWiFi() {
 
+  if (!sysConf.wifi_en) {
+    dma_display->clearScreen();
+    dma_display->setCursor(1,1 + fontDelta);
+    dma_display->print("Wifi");
+    dma_display->setCursor(1,10 + fontDelta);
+    dma_display->print("Disabled");
+    delay(2000);
+    return;
+  }
+
   dma_display->clearScreen();
   dma_display->setCursor(1,1 + fontDelta);
   dma_display->print("Connecting");
   
   WiFi.mode(WIFI_STA);
-  WiFi.begin(ssid, password);
+  WiFi.begin(sysConf.wifi_ssid, sysConf.wifi_pswd);
   //Serial.print("Connecting to WiFi ..");
   for (int i = 0; WiFi.status() != WL_CONNECTED; i++) {
     //Serial.print('.');

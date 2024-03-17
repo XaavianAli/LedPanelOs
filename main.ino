@@ -1,22 +1,23 @@
 //PIN 25 ON THE WROOM-ESP32 SHOULD NOT BE USED AS GPIO FOR VOLTAGE SENSITIVE DEVICES WHEN WIFI IS ENABLED AS IT CAUSES VOLTAGE SPIKES DURING WIFI UPLINK/DOWNLINK OPERATIONS
 //Pin 2 also causes some dumb issues
-//Use Serial1 or Serial2instead of Serial or else you degrade the speed of the LED panel (Unless you set a very high baud rate I guess (Which you should do))
+//Use Serial1 or Serial2 instead of Serial or else you degrade the speed of the LED panel (Unless you set a very high baud rate I guess (Which you should do))
 
 #include <WiFi.h>
 #include <UnixTime.h>
 #include <ESP32-HUB75-MatrixPanel-I2S-DMA.h>
 #include <ESP32Ping.h>
 #include <Adafruit_GFX.h>
+#include <ArduinoJson.h>
 #include "AiEsp32RotaryEncoder.h"
-//#include <Fonts/Tiny3x3a2pt7b.h>
 
 // ONCE I FINISH WITH A NAVIGATABLE MENU
 // I SHOULD START VERSIONING
 // START WITH 0.1.0
-
+#include "const.h"
 #include "display.h"
-#include "system.h"
 #include "sd.h"
+#include "config.h"
+#include "system.h"
 #include "time.h"
 #include "icons.h"
 #include "input.h"
@@ -50,11 +51,12 @@ void setup() {
   dma_display->setTextWrap(true);
 
   Serial.begin(500000);
-  
+
+  sdSetup();
+  loadConfig();
+  rotarySetup();
   initWiFi();
   configTime(0, 0, ntpServer);
-  sdSetup();
-  rotarySetup();
 
 }
 
