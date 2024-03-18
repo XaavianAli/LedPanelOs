@@ -7,5 +7,6 @@
 #include "rotaryTest.h"
 #include "kirby.h"
 #include "plasma.h"
+#include "snake.h"
 
 #endif

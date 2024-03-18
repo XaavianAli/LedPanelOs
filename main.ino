@@ -67,6 +67,7 @@ void loop(){
   menuItem menuItems[] = {
     {"Clock", displayTime},
     {"Kirby", kirbyMe},
+    {"Snake", snake},
     {"Rot.Test", rotaryTest},
     {"Plasma", plasma},
     {"Sample", sampleApp},
