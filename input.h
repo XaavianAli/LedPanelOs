@@ -39,11 +39,11 @@ class rotary {
     return !digitalRead(b);
   }
   int readM(){
-    int current = digitalRead(m);
-    if (current == 1 && !pressedM){
+    int ccurrent = digitalRead(m);
+    if (ccurrent == 1 && !pressedM){
       pressedM = true;
       return 1;
-    } else if (current == 0 && pressedM){
+    } else if (ccurrent == 0 && pressedM){
       pressedM = false;
     }
     return 0;
@@ -64,9 +64,9 @@ void rotarySetup() {
 
   wheel.r = AiEsp32RotaryEncoder(ROTARY_ENCODER_A_PIN, ROTARY_ENCODER_B_PIN, ROTARY_ENCODER_BUTTON_PIN, ROTARY_ENCODER_VCC_PIN, ROTARY_ENCODER_STEPS);
   wheel.b = 34;
-  wheel.m = 35;
-  pinMode(34, INPUT_PULLUP);
-  pinMode(35, INPUT_PULLDOWN);
+  wheel.m = 1;
+  pinMode(wheel.b, INPUT_PULLUP);
+  pinMode(wheel.m, INPUT_PULLUP);
   wheel.r.begin();
   wheel.r.setup(readEncoderISR);
   wheel.r.setBoundaries(0, 100000000, false);
