@@ -12,7 +12,7 @@ int main(){
 	fstream *input;
 	input = new fstream;
 
-	string filename = "splash.bmp";
+	string filename = "k2.bmp";
 
 	//Opening bitmap file 
 	input->open(filename, ios::binary | ios::in | ios::out);

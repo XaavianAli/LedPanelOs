@@ -5,10 +5,11 @@ void kirbyMe(){
   
   // Setup
   dma_display->clearScreen();
-  printIcon(0,0,&korby);
+  int i = 0;
+  //printIcon(0,0,&korby);
   
   // Loop
-  int loopDelay = -1;
+  int loopDelay = 500;
   int loopCounter = 0;
   for(;;){
     
@@ -24,6 +25,12 @@ void kirbyMe(){
       loopCounter = 0;
     }
     
+
+    
+    dma_display->clearScreen();
+    printIcon(0,0,kirbys[i%2]);
+    i++;
+
   }
   
 }
